@@ -5,7 +5,7 @@ import ScoreboardUtil
 royalsTeamId = str("118")
 #is there a game today
 
-print(ScoreboardUtil.gameToday(royalsTeamId))
+#print(ScoreboardUtil.gameToday(royalsTeamId))
 #How to handle doubleheaders
 
 #if no game today, print record or something else
@@ -16,3 +16,6 @@ if not ScoreboardUtil.gameToday(royalsTeamId):
 
 #is game now / upcoming / or past
 
+#game now? print game
+print(ScoreboardUtil.homeOrAway(royalsTeamId, ScoreboardUtil.getTodaysGame(royalsTeamId)))
+print(ScoreboardUtil.printGame(royalsTeamId))
