@@ -17,5 +17,11 @@ if not ScoreboardUtil.gameToday(royalsTeamId):
 #is game now / upcoming / or past
 
 #game now? print game
-print(ScoreboardUtil.homeOrAway(royalsTeamId, ScoreboardUtil.getTodaysGame(royalsTeamId)))
-print(ScoreboardUtil.printGame(royalsTeamId))
+if ScoreboardUtil.gameToday(royalsTeamId):
+    todaysGame = ScoreboardUtil.getTodaysGame(royalsTeamId)
+    if ScoreboardUtil.gameNow(todaysGame):
+        print(ScoreboardUtil.printGame(royalsTeamId))
+    elif ScoreboardUtil.gameFinished(todaysGame):
+        print("Finished")
+    else:
+        print("Upcoming")
