@@ -1,7 +1,37 @@
 import urllib.request
 import json
 import time
-from datetime import datetime
+from datetime import datetime, timedelta
+
+def time_until_next_mlb_game(team_id):
+    # MLB Stats API endpoint for today's games
+    endpoint = f"https://statsapi.mlb.com/api/v1/schedule?sportId=1&teamId={team_id}&date="
+    
+    # Get today's date in YYYY-MM-DD format
+    today_date = datetime.today().strftime('%Y-%m-%d')
+    
+    # Make a request to the MLB Stats API to get today's games
+    url = endpoint + today_date
+    req = urllib.request.Request(url)
+    
+    try:
+        with urllib.request.urlopen(req) as response:
+            data = json.loads(response.read().decode())
+            if 'dates' in data and len(data['dates']) > 0:
+                games = data['dates'][0]['games']
+                if len(games) > 0:
+                    # Find the earliest game time
+                    earliest_game_time = min([datetime.strptime(game['gameDate'], '%Y-%m-%dT%H:%M:%SZ') for game in games])
+                    # Calculate time difference between now and the earliest game
+                    time_difference = earliest_game_time - datetime.utcnow()
+                    # Return the time until the next MLB game
+                    return time_difference
+                else:
+                    return "No MLB games today for the specified team."
+            else:
+                return "No MLB games today for the specified team."
+    except urllib.error.HTTPError as e:
+        return f"Failed to retrieve data from the MLB Stats API: {e}"
 
 def gameToday(team):
     gameTodayContent = urllib.request.urlopen("https://statsapi.mlb.com/api/v1/schedule/games/?sportId=1&teamId=" + team).read()
@@ -12,6 +42,7 @@ def nextGame(team):
     today = datetime.today().strftime('%Y-%m-%d')
     year = datetime.today().strftime('%Y')
     scheduleContent = urllib.request.urlopen("https://statsapi.mlb.com/api/v1/schedule/games/?sportId=1&startDate=" + today + "&endDate=" + year + "-12-29&teamId=" + team).read()
+    print("https://statsapi.mlb.com/api/v1/schedule/games/?sportId=1&startDate=" + today + "&endDate=" + year + "-12-29&teamId=" + team)
     scheduleParsedContent = json.loads(scheduleContent)
     return scheduleParsedContent["dates"][0]["date"]
 
@@ -19,6 +50,9 @@ def getTodaysGame(team):
     gameContent = urllib.request.urlopen("https://statsapi.mlb.com/api/v1/schedule/games/?sportId=1&teamId=" + team).read()
     gameParsedContent = json.loads(gameContent)
     return gameParsedContent["dates"][0]["games"][0]
+
+def gameFinished(game):
+    return game["status"]["abstractGameState"] == "Final"
 
 def homeOrAway(team, game):
     if game["teams"]["home"]["team"]["id"] == int(team):
@@ -51,3 +85,4 @@ def printGame(team):
         print(teamName(team) + ": " + str(linescore["teams"][homeOrAway(team, game)]["runs"]))
         print(teamName(opponentId) + ": " + str(linescore["teams"][opponentHomeOrAway(team, game)]["runs"]))
         time.sleep(5)
+
