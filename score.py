@@ -11,7 +11,7 @@ logging.basicConfig(filename='score.log',
 
 logger = logging.getLogger()
 
-print(ScoreboardUtil.time_until_next_mlb_game(royalsTeamId))
+print(ScoreboardUtil.get_hours_until_next_game(royalsTeamId))
 #while(1==1):
  #   gameToday = ScoreboardUtil.nextGame(royalsTeamId)
  #   print(gameToday)

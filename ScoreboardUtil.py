@@ -1,7 +1,36 @@
 import urllib.request
 import json
 import time
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
+
+def get_hours_until_next_game(team_id):
+    # MLB Stats API endpoint to fetch MLB game schedule
+    api_url = f"https://statsapi.mlb.com/api/v1/schedule?sportId=1&date="
+    # Get today's date
+    today_date = datetime.now().strftime('%Y-%m-%d')
+    
+    req = urllib.request.Request(f"{api_url}{today_date}&teamId={team_id}&hydrate=team,linescore(runners),flags,liveLookin,review,decisions,probablePitcher(note)")
+    
+    with urllib.request.urlopen(req) as response:
+        data = json.loads(response.read().decode())
+
+        # Find the next game for the given team ID
+        game = data['dates'][0]['games'][0]
+        game_time_str = game['gameDate']  # Game date and time in ISO format
+        game_time = datetime.fromisoformat(game_time_str[:-1])  # Removing 'Z' from the end
+        
+        current_time = datetime.utcnow()
+        
+        # Calculate the time difference
+        print("gametime: " + str(game_time))
+        print("current: " + str(current_time))
+        time_difference = game_time - current_time
+        
+        # Convert time difference to hours
+        hours_until_game = int(time_difference.total_seconds() / 3600)
+        
+        
+        return hours_until_game
 
 def time_until_next_mlb_game(team_id):
     # MLB Stats API endpoint for today's games
